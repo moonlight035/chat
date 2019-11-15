@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.moonlight035.chatserver.inforequest.user.UserInfoDao">
+    <resultMap id="userInfoMap" type="cn.moonlight035.chatserver.inforequest.user.model.UserVO">
+        <result property="name" column="name"/>
+        <result property="account" column="account"></result>
+    </resultMap>
+
+    <parameterMap id="userFormMap" type="cn.moonlight035.chatserver.inforequest.user.model.UserInfoForm">
+        <parameter property="account"/>
+        <parameter property="name"/>
+    </parameterMap>
+    <!--查询所有用户-->
+    <select id="getUserInfo" resultMap="userInfoMap"  parameterMap="userFormMap">
+        select name,account
+        from chat_user
+        <where>
+            <if test="name!=null">and name = #{name}</if>
+            <if test="account!=null">and name = #{account}</if>
+        </where>
+    </select>
+
+    <!--登陆验证-->
+    <select id="login" resultType="integer"  parameterMap="userFormMap">
+        select count(*)
+        from chat_user
+        where account = #{account} and password = #{password} and status=1
+    </select>
+
+    <!--获取好友-->
+    <select id="getFriendInfo" resultMap="userInfoMap" parameterType="string">
+        select u2.account,u2.name
+        from chat_user as u1
+        join chat_friend as f on u1.id = f.userid
+        join chat_user as u2 on u2.id = f.friendid
+        where u1.account=#{account}
+        union
+        select u1.account,u1.name
+        from chat_user as u1
+        join chat_friend as f on u1.id = f.userid
+        join chat_user as u2 on u2.id = f.friendid
+        where u2.account=#{account}
+    </select>
+
+    <!--添加用户-->
+    <insert id="addUser" parameterMap="userFormMap">
+        insert into
+        chat_user(name,account,password)
+        values(${name},${account},${password})
+    </insert>
+
+    <!--删除用户-->
+    <update id="deleteUser" parameterType="string">
+        update chat_user
+        set status=0
+        where account=${account}
+    </update>
+
+</mapper>

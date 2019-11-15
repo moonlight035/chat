@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.moonlight035.chatserver.inforequest.chathistory.ChatHistoryInfoDao">
+
+    <!--插入聊天记录-->
+    <insert id="insertHistory"  parameterType="cn.moonlight035.chatserver.inforequest.chathistory.model.UserChatForm">
+        insert into
+        chat_chathistory(fromid,toid,content,status)
+        select u1.id,u2.id,#{content},#{status}
+        from chat_user as u1 ,chat_user as u2
+        where u1.account=#{fromAccount} and u2.account=#{toAccount}
+    </insert>
+
+</mapper>
